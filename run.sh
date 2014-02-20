@@ -10,6 +10,7 @@ build_run()
     local compiler_type CC version
     compiler_type=$1
     CC=$2
+    static=$3
 
     case "$compiler_type" in
     clang)
@@ -26,12 +27,13 @@ build_run()
 
     DIR=$OS/$REL/$MACHINE/$compiler_type/$version
     mkdir -p $DIR
-    $CC -g -O0 -Wall -o $DIR/gen-core$SRCVER -lpthread gen-core.c
-    (cd $DIR && ./gen-core$SRCVER)
+    $CC $static -g -O0 -Wall -o $DIR/gen-core$static$SRCVER gen-core.c -lpthread
+    (cd $DIR && ./gen-core$static$SRCVER)
 }
 
 for compiler in clang gcc; do
     if cc=$(which $compiler 2>/dev/null); then
         build_run $compiler $cc
+        build_run $compiler $cc -static
     fi
 done
